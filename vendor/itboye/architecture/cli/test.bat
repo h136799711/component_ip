@@ -1,1 +1,0 @@
-php ./producer.php
