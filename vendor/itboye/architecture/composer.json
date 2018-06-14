@@ -1,0 +1,41 @@
+{
+  "name": "itboye/architecture",
+  "description": "architecture test",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "itboye",
+    "hebidu"
+  ],
+  "minimum-stability": "dev",
+  "authors": [
+    {
+      "name": "hebidu",
+      "email": "hebiduhebi@126.com",
+      "role": "developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "by\\": "src/",
+      "byTest\\": "test/",
+      "byCli\\": "cli/"
+    }
+  },
+  "repositories": {
+    "packagist": {
+      "type": "composer",
+      "url": "https://packagist.phpcomposer.com"
+    }
+  },
+  "require": {
+    "php": ">=5.5",
+    "php-amqplib/php-amqplib": "2.7.*"
+  },
+  "require-dev": {
+    "php": ">=5.5",
+    "phpunit/phpunit": "6.2",
+    "php-amqplib/php-amqplib": "2.7.*",
+    "phpdocumentor/phpdocumentor": "2.*"
+  }
+}
