@@ -16,7 +16,7 @@ class IpHelper
 {
     /**
      * @param $ip
-     * @return array|string
+     * @return \by\infrastructure\base\CallResult
      * @throws \Exception
      */
     public static function getRegionByIp($ip)
@@ -32,8 +32,8 @@ class IpHelper
             $entity->setFrom("local");
             return CallResultHelper::success($entity);
         } elseif ($result == "N/A") {
-            $result = self::getFromTaobao($ip);
-            if ($result->isSuccess()) return $result;
+            $tbResult = self::getFromTaobao($ip);
+            if ($tbResult->isSuccess()) return $tbResult;
         }
 
         return CallResultHelper::success(["from"=>"unknown", "country"=>"unknown", "province"=>"unknown", "city"=>"unknown"]);
@@ -83,6 +83,11 @@ class IpHelper
     }
 
 
+    /**
+     * 从淘宝REST接口获取
+     * @param $ip
+     * @return \by\infrastructure\base\CallResult
+     */
     public static function getFromTaobao($ip)
     {
         $context = stream_context_create(array(
