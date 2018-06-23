@@ -20,23 +20,33 @@ class IpHelperTest extends TestCase
      */
     public function testFind()
     {
+        $ip = "127.0.0.1";
+        $result = IpHelper::getRegionByIp($ip);
+        var_dump($result);
+        $ip = "333.333.333.333";
+        $result = IpHelper::getRegionByIp($ip);
+        var_dump($result);
         $ip = "101.37.37.167";
-
-        $result = IpHelper::getCountryByIp($ip);
+        $result = IpHelper::getFromTaobao($ip);
         var_dump($result);
-        Assert::assertTrue($result->isSuccess());
-        Assert::assertEquals("中国", $result->getData());
-
         $ip = "47.88.216.242";
-
-        $result = IpHelper::getCountryByIp($ip);
+        $result = IpHelper::getRegionByIp($ip);
         var_dump($result);
-        Assert::assertTrue($result->isSuccess());
-        Assert::assertEquals("新加坡", $result->getData());
-
-        $ip = "112.16.93.124";
-        $result = IpHelper::getCountryByIp($ip);
-        Assert::assertTrue($result->isSuccess());
-        Assert::assertEquals("中国", $result->getData());
+//        $result = IpHelper::getCountryByIp($ip);
+//        var_dump($result);
+//        Assert::assertTrue($result->isSuccess());
+//        Assert::assertEquals("中国", $result->getData());
+//
+//        $ip = "47.88.216.242";
+//
+//        $result = IpHelper::getCountryByIp($ip);
+//        var_dump($result);
+//        Assert::assertTrue($result->isSuccess());
+//        Assert::assertEquals("新加坡", $result->getData());
+//
+//        $ip = "112.16.93.124";
+//        $result = IpHelper::getCountryByIp($ip);
+//        Assert::assertTrue($result->isSuccess());
+//        Assert::assertEquals("中国", $result->getData());
     }
 }

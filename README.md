@@ -9,4 +9,9 @@ ip
 
 # version history
 
-v1.0.0 第一版本
+v1.0.1 第一版本
+
+```
+    $ip = "127.0.0.1";
+   $result = IpHelper::getCountryByIp($ip);
+```

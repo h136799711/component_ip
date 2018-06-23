@@ -10,9 +10,34 @@ namespace by\component\ipAddress;
 
 
 use by\infrastructure\helper\CallResultHelper;
+use by\infrastructure\helper\Object2DataArrayHelper;
 
 class IpHelper
 {
+    /**
+     * @param $ip
+     * @return array|string
+     * @throws \Exception
+     */
+    public static function getRegionByIp($ip)
+    {
+        $result = LocalDbIpHelper::find($ip);
+
+        if (is_array($result) && count($result) > 2) {
+            $entity = new IpLocEntity();
+            $entity->setIp($ip);
+            $entity->setCountry($result[0]);
+            $entity->setProvince($result[1]);
+            $entity->setCity($result[2]);
+            $entity->setFrom("local");
+            return CallResultHelper::success($entity);
+        } elseif ($result == "N/A") {
+            $result = self::getFromTaobao($ip);
+            if ($result->isSuccess()) return $result;
+        }
+
+        return CallResultHelper::success(["from"=>"unknown", "country"=>"unknown", "province"=>"unknown", "city"=>"unknown"]);
+    }
 
     /**
      *
@@ -54,17 +79,33 @@ class IpHelper
             }
         }
 
-        $info = @file_get_contents("http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=" . $ip, 0, $context);
+        return CallResultHelper::fail('device login ip is invalid');
+    }
+
+
+    public static function getFromTaobao($ip)
+    {
+        $context = stream_context_create(array(
+            'http' => array(
+                'timeout' => 5 //超时时间，单位为秒
+            )
+        ));
+
+        $info = @file_get_contents("http://ip.taobao.com/service/getIpInfo.php?ip=" . $ip, 0, $context);
         if ($info !== false) {
             $info = json_decode($info, JSON_OBJECT_AS_ARRAY);
-            if ($info != false && is_array($info) && array_key_exists('ret', $info)) {
-                $ret = intval($info['ret']);
-                if ($ret == 1) {
-                    $country = $info['country'];
-                    return CallResultHelper::success($country);
+            $entity = new IpLocEntity();
+            if (array_key_exists('data', $info)) {
+                $data = $info['data'];
+                Object2DataArrayHelper::setData($entity, $data);
+                if (array_key_exists('region', $data)) {
+                    $entity->setProvince($data['region']);
                 }
             }
+
+            $entity->setFrom("taobao");
+            return CallResultHelper::success($entity);
         }
-        return CallResultHelper::fail('device login ip is invalid');
+        return CallResultHelper::fail();
     }
 }
