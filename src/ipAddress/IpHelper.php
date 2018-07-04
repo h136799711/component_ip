@@ -34,6 +34,10 @@ class IpHelper
             $entity->setProvince($result[1]);
             $entity->setCity($result[2]);
             $entity->setFrom("local");
+            
+            if (empty($entity->getCity()) || $entity->getCity() == "XX") {
+                $entity->setCity($entity->getProvince());
+            }
             return CallResultHelper::success($entity);
         } elseif ($result == "N/A") {
             $tbResult = self::getFromTaobao($ip);
@@ -114,6 +118,10 @@ class IpHelper
                 if ($entity->getProvince() == '澳门' || $entity->getProvince() == '香港'
                     || $entity->getProvince() == '台湾' ) {
                     $entity->setCountry('中国');
+                }
+
+                if (empty($entity->getCity()) || $entity->getCity() == "XX") {
+                    $entity->setCity($entity->getProvince());
                 }
             }
 
