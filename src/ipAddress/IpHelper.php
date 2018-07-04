@@ -26,6 +26,10 @@ class IpHelper
         if (is_array($result) && count($result) > 2) {
             $entity = new IpLocEntity();
             $entity->setIp($ip);
+            if ($result[1] == '澳门' || $result[1] == '香港'
+                || $result[1] == '台湾' ) {
+                $result[0] = '中国';
+            }
             $entity->setCountry($result[0]);
             $entity->setProvince($result[1]);
             $entity->setCity($result[2]);
@@ -105,6 +109,11 @@ class IpHelper
                 Object2DataArrayHelper::setData($entity, $data);
                 if (array_key_exists('region', $data)) {
                     $entity->setProvince($data['region']);
+                }
+                // 针对特别行政区改成中国
+                if ($entity->getProvince() == '澳门' || $entity->getProvince() == '香港'
+                    || $entity->getProvince() == '台湾' ) {
+                    $entity->setCountry('中国');
                 }
             }
 
