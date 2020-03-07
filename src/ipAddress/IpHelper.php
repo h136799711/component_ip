@@ -27,24 +27,32 @@ class IpHelper
             $entity = new IpLocEntity();
             $entity->setIp($ip);
             if ($result[1] == '澳门' || $result[1] == '香港'
-                || $result[1] == '台湾' ) {
+                || $result[1] == '台湾') {
                 $result[0] = '中国';
             }
+
             $entity->setCountry($result[0]);
             $entity->setProvince($result[1]);
             $entity->setCity($result[2]);
             $entity->setFrom("local");
-            
+
             if (empty($entity->getCity()) || $entity->getCity() == "XX") {
-                $entity->setCity($entity->getProvince());
+                $tbResult = self::getFromPconline($ip);
+                if ($tbResult->isSuccess()) {
+                    return $tbResult;
+                }
+                else {
+                    $entity->setCity($entity->getProvince());
+                }
             }
             return CallResultHelper::success($entity);
+
         } elseif ($result == "N/A") {
-            $tbResult = self::getFromTaobao($ip);
+            $tbResult = self::getFromPconline($ip);
             if ($tbResult->isSuccess()) return $tbResult;
         }
 
-        return CallResultHelper::success(["from"=>"unknown", "country"=>"unknown", "province"=>"unknown", "city"=>"unknown"]);
+        return CallResultHelper::success(["from" => "unknown", "country" => "unknown", "province" => "unknown", "city" => "unknown"]);
     }
 
     /**
@@ -116,7 +124,7 @@ class IpHelper
                 }
                 // 针对特别行政区改成中国
                 if ($entity->getProvince() == '澳门' || $entity->getProvince() == '香港'
-                    || $entity->getProvince() == '台湾' ) {
+                    || $entity->getProvince() == '台湾') {
                     $entity->setCountry('中国');
                 }
 
@@ -126,6 +134,38 @@ class IpHelper
             }
 
             $entity->setFrom("taobao");
+            return CallResultHelper::success($entity);
+        }
+        return CallResultHelper::fail();
+    }
+
+
+    public static function getFromPconline($ip)
+    {
+        $context = stream_context_create(array(
+            'http' => array(
+                'timeout' => 3 //超时时间，单位为秒
+            )
+        ));
+
+        //http://ip-api.com/json/43.227.139.167?lang=zh-CN&fields=57369
+        $info = @file_get_contents("http://ip-api.com/json/$ip?lang=zh-CN&fields=57369", 0, $context);
+        if ($info !== false) {
+            $info = json_decode($info, JSON_OBJECT_AS_ARRAY);
+            $entity = new IpLocEntity();
+            if ($info['status'] != "success") {
+                return CallResultHelper::fail("查询失败");
+            }
+            if (!array_key_exists('country', $info) || !array_key_exists('regionName', $info)
+                || !array_key_exists('city', $info)) {
+                return CallResultHelper::fail('数据字段缺失');
+            }
+            $entity->setCountry($info['country']);
+            $entity->setProvince($info['regionName']);
+            $entity->setCity($info['city']);
+            $entity->setIp($ip);
+            //{"ip":"43.227.139.167","pro":"湖北省","proCode":"420000","city":"武汉市","cityCode":"420100","region":"","regionCode":"0","addr":"湖北省武汉市 广电网","regionNames":"","err":""}
+            $entity->setFrom("pconline");
             return CallResultHelper::success($entity);
         }
         return CallResultHelper::fail();
