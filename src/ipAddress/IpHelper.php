@@ -37,12 +37,7 @@ class IpHelper
             $entity->setFrom("local");
 
             if (empty($entity->getCity()) || $entity->getCity() == "XX") {
-                $tbResult = self::getFromPconline($ip);
-                if ($tbResult->isSuccess()) {
-                    return $tbResult;
-                } else {
-                    $entity->setCity('未定位地区');
-                }
+                $entity->setCity('未定位地区');
             }
             return CallResultHelper::success($entity);
 
