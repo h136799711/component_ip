@@ -40,9 +40,8 @@ class IpHelper
                 $tbResult = self::getFromPconline($ip);
                 if ($tbResult->isSuccess()) {
                     return $tbResult;
-                }
-                else {
-                    $entity->setCity($entity->getProvince());
+                } else {
+                    $entity->setCity('未定位地区');
                 }
             }
             return CallResultHelper::success($entity);
@@ -129,7 +128,7 @@ class IpHelper
                 }
 
                 if (empty($entity->getCity()) || $entity->getCity() == "XX") {
-                    $entity->setCity($entity->getProvince());
+                    $entity->setCity('未定位地区');
                 }
             }
 
